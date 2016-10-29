@@ -27,6 +27,8 @@ defmodule Impact.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:hulaaki, "~> 0.0.4"}
+    ]
   end
 end
