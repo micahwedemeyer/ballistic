@@ -1,0 +1,2 @@
+defmodule Impact do
+end
