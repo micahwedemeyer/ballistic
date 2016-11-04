@@ -1,23 +1,24 @@
 defmodule Impact.MqttClient do
-  use Hulaaki.Client
   alias Hulaaki.Message.Publish
-
   alias Impact.Server
+  use Hulaaki.Client
 
-  # TODO - Remove this, as this is something for a Supervisor to handle
-  def start_and_connect do
-    start_link
-    connect([client_id: "srv-1234", host: "localhost", port: 1883])
+  # Define like this to override/overrule the start_link in Hulaaki.Client
+  def start_link({:first}, name) do
+    {:ok, pid} = GenServer.start_link(__MODULE__, %{}, name: name)
+    {:ok, connect(pid)}
   end
 
-  def start_link do
-    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
-  end
+  def connect(pid) do
+    opts = [
+      client_id: Application.get_env(:impact, :mqtt_client_id),
+      host: Application.get_env(:impact, :mqtt_host),
+      port: Application.get_env(:impact, :mqtt_port)
+    ]
 
-  def connect(opts) do
-    {:ok, conn_pid} = GenServer.whereis(__MODULE__)
-    |> Hulaaki.Connection.start_link
-    GenServer.call(__MODULE__, {:connect, opts, conn_pid})
+    # Call Hulaaki.Client.connect
+    connect(pid, opts)
+    pid
   end
 
   # Public API

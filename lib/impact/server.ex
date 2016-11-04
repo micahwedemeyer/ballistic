@@ -2,8 +2,8 @@ defmodule Impact.Server do
   use GenServer
   require Logger
 
-  def start_link do
-    GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
+  def start_link(name) do
+    GenServer.start_link(__MODULE__, :ok, name: name)
   end
 
   def add_team(id, name, color) do

@@ -28,3 +28,8 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
 #     import_config "#{Mix.env}.exs"
+
+config :impact,
+  mqtt_client_id: "impact-server",
+  mqtt_host: "localhost",
+  mqtt_port: 1883
