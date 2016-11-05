@@ -41,6 +41,7 @@ defmodule Impact.Server do
     IO.puts "#{new_state[:hits]} hits reported"
 
     Impact.MqttClient.set_target_winner()
+    Impact.SlackClient.send_message("It's a hit!", "#bs-boardgames")
     {:noreply, new_state}
   end
 end

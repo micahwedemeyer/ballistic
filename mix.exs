@@ -15,7 +15,7 @@ defmodule Impact.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [
-      applications: [:logger],
+      applications: [:logger, :slack],
       mod: {Impact, []}
     ]
   end
@@ -31,7 +31,8 @@ defmodule Impact.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:hulaaki, "~> 0.0.4"}
+      {:hulaaki, "~> 0.0.4"},
+      {:slack, "~> 0.8.0"}
     ]
   end
 end

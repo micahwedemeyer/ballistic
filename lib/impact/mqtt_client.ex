@@ -31,7 +31,7 @@ defmodule Impact.MqttClient do
   end
 
   def subscribe_to_hits do
-    subscribe(id: 1, topics: ["hits"], qoses: [1])
+    subscribe(id: 1, topics: ["hits"], qoses: [0])
   end
 
 
