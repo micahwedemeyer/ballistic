@@ -10,12 +10,16 @@ defmodule Impact.Server do
     GenServer.call(__MODULE__, {:add_team, id, name, color})
   end
 
-  def report_hit(hit_data) do
-    GenServer.cast(__MODULE__, {:report_hit, hit_data})
+  def report_hit(%Impact.Messages.Hit{} = hit) do
+    GenServer.cast(__MODULE__, {:report_hit, hit})
   end
 
   def get_teams() do
     GenServer.call(__MODULE__, {:get_teams})
+  end
+
+  def report_introduction(%Impact.Messages.Introduction{} = intro) do
+    GenServer.cast(__MODULE__, {:report_introduction, intro})
   end
 
   ## GenServer Callbacks
@@ -35,13 +39,21 @@ defmodule Impact.Server do
     #{:reply, teams, state}
   end
 
-  def handle_cast({:report_hit, hit_data}, state) do
+  def handle_cast({:report_hit, hit}, state) do
     # Save somewhere? The database?
     new_state = state |> Map.update!(:hits, &(&1 + 1))
     IO.puts "#{new_state[:hits]} hits reported"
 
-    Impact.MqttClient.set_target_winner()
+    # Notify the winner
+    Impact.MqttClient.play_show(hit.deviceId, "win")
+
+    # TODO: For all other devices, play a loss show
+
     Impact.SlackClient.send_message("It's a hit!", "#bs-boardgames")
     {:noreply, new_state}
+  end
+
+  def handle_cast({:report_introduction, intro}, state) do
+    
   end
 end

@@ -32,7 +32,8 @@ defmodule Impact.Mixfile do
   defp deps do
     [
       {:hulaaki, "~> 0.0.4"},
-      {:slack, "~> 0.8.0"}
+      {:slack, "~> 0.8.0"},
+      {:poison, "~> 3.0"}
     ]
   end
 end

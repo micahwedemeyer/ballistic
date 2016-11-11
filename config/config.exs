@@ -33,3 +33,6 @@ config :impact,
   mqtt_client_id: "impact-server",
   mqtt_host: "localhost",
   mqtt_port: 1883
+
+config :slack,
+  api_token: "xoxp-3354944671-40916064385-100693059171-c7b4409d0176e82cd8fbe92dd357ead1"
