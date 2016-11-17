@@ -22,11 +22,6 @@ defmodule Impact.MqttClient do
   end
 
   # Public API
-  def play_show(deviceId, showId) do
-    message = Poison.encode!(%Impact.Messages.PlayShow{showId: showId})
-    publish(topic: "darter/#{deviceId}/playShow", message: message, qos: 0, dup: 0, retain: 0)
-  end
-
   def go_live(deviceId, {red, green, blue}) do
     message = Poison.encode!(%Impact.Messages.GoLive{red: red, green: green, blue: blue})
     publish(topic: "darter/#{deviceId}/goLive", message: message, qos: 0, dup: 0, retain: 0)
@@ -50,11 +45,11 @@ defmodule Impact.MqttClient do
   # Override callbacks from Hulaaki.Client
   def on_subscribed_publish(message: %Publish{topic: "hits"} = message, state: _) do
     hit = Poison.decode!(message.message, as: %Impact.Messages.Hit{})
-    Server.report_hit(hit)
+    Impact.Target.hit(hit[:deviceId], hit[:timestamp])
   end
 
   def on_subscribed_publish(message: %Publish{topic: "introduction"} = message, state: _) do
     intro = Poison.decode!(message.message, as: %Impact.Messages.Introduction{})
-    Server.report_introduction(intro)
+    Impact.TargetSupervisor.init_target(intro[:deviceId])
   end
 end
