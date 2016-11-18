@@ -6,6 +6,10 @@ defmodule Impact.Server do
     GenServer.start_link(__MODULE__, :ok, name: name)
   end
 
+  def go_live() do
+    GenServer.cast(__MODULE__, {:go_live})
+  end
+
   def report_hit(device_id) do
     GenServer.cast(__MODULE__, {:report_hit, device_id})
   end
@@ -31,6 +35,16 @@ defmodule Impact.Server do
 
     # Report the result on slack
     #Impact.SlackClient.send_message("It's a hit!", "#bs-boardgames")
+    {:noreply, state}
+  end
+
+  def handle_cast({:go_live}, state) do
+    Logger.info("Going live!")
+
+    Impact.TargetSupervisor.target_device_ids
+    |> Enum.each(&(Impact.Target.go_live(&1)))
+
+    #Impact.SlackClient.send_message(":fireworks" Targets Live! :fireworks:", "#bs-boardgames")
     {:noreply, state}
   end
 end

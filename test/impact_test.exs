@@ -36,4 +36,9 @@ defmodule ImpactTest do
 
     assert (Impact.TargetSupervisor.target_device_ids() |> Enum.sort) == ["1234", "abcd", "newtarget", "xyz"]
   end
+
+  test "going live" do
+    Impact.Server.go_live()
+    :timer.sleep(100)
+  end
 end

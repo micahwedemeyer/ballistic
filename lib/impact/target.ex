@@ -28,6 +28,10 @@ defmodule Impact.Target do
     |> GenServer.cast({:play_show, show_id})
   end
 
+  def go_live(device_id) do
+    play_show(device_id, "live")
+  end
+
   # Private?
   defp via_tuple(device_id) do
     {:via, :gproc, {:n, :l, {:device_id, device_id}}}
