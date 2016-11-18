@@ -6,16 +6,8 @@ defmodule Impact.Server do
     GenServer.start_link(__MODULE__, :ok, name: name)
   end
 
-  def add_team(id, name, color) do
-    GenServer.call(__MODULE__, {:add_team, id, name, color})
-  end
-
   def report_hit(device_id) do
     GenServer.cast(__MODULE__, {:report_hit, device_id})
-  end
-
-  def get_teams() do
-    GenServer.call(__MODULE__, {:get_teams})
   end
 
   ## GenServer Callbacks
@@ -23,16 +15,6 @@ defmodule Impact.Server do
   def init(:ok) do
     Logger.debug "Impact server started"
     {:ok, %{hits: 0}}
-  end
-
-  def handle_call({:add_team, id, name, color}, _from, state) do
-    # Add the team to the 
-    {:reply}
-  end
-
-  def handle_call({:get_teams}, _from, state) do
-    # Extract the teams from the state?
-    #{:reply, teams, state}
   end
 
   def handle_cast({:report_hit, device_id}, state) do
