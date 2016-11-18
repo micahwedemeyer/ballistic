@@ -18,10 +18,6 @@ defmodule Impact.Server do
     GenServer.call(__MODULE__, {:get_teams})
   end
 
-  def report_introduction(%Impact.Messages.Introduction{} = intro) do
-    GenServer.cast(__MODULE__, {:report_introduction, intro})
-  end
-
   ## GenServer Callbacks
 
   def init(:ok) do
@@ -41,16 +37,18 @@ defmodule Impact.Server do
 
   def handle_cast({:report_hit, device_id}, state) do
     # Save somewhere? The database?
-    Logger.debug("Server receives hit report for #{device_id}")
+    Logger.info("Hit! (#{device_id})")
 
+    # Winner plays the win show
     Impact.Target.play_show(device_id, "win")
 
-    # TODO: For all other devices, play a loss show
+    # Play a lose show for everyone else
+    other_targets = Impact.TargetSupervisor.target_device_ids
+    |> Enum.reject(&(&1 == device_id))
+    |> Enum.each(&(Impact.Target.play_show(&1, "lose")))
+
+    # Report the result on slack
     #Impact.SlackClient.send_message("It's a hit!", "#bs-boardgames")
     {:noreply, state}
-  end
-
-  def handle_cast({:report_introduction, intro}, state) do
-    
   end
 end

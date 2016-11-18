@@ -25,6 +25,10 @@ defmodule Impact.TargetMqttClient do
     subscribe(id: 1, topics: ["darter/+/hits"], qoses: [0])
   end
 
+  def subscribe_to_introductions do
+    subscribe(id: 1, topics: ["darter/+/introduction"], qoses: [0])
+  end
+
   def play_show(device_id, show_id) do
     message = Poison.encode!(%Impact.Messages.PlayShow{showId: show_id})
     publish(topic: "darter/#{device_id}/playShow", message: message, qos: 0, dup: 0, retain: 0)
@@ -42,17 +46,22 @@ defmodule Impact.TargetMqttClient do
     |> publish(options)
   end
 
-  def on_publish(message, state) do
-    Logger.debug("onpub")
-  end
-
   def on_subscribed_publish(message: %Publish{} = message, state: state) do
-    Logger.debug("TargetMqttClient received message on #{message.topic}")
-    device_id = ~r/darter\/(.*)\/hits/ |> Regex.run(message.topic) |> Enum.at(1)
+    Logger.debug("TargetMqttClient received message on #{message.topic}: #{message.message}")
 
-    if device_id do
-      hit = Poison.decode!(message.message, as: %Impact.Messages.Hit{})
-      Impact.Target.hit(hit.deviceId, hit.timestamp)
+    topic = message.topic
+    hits_regex = ~r/darter\/(.*)\/hits/
+    intro_regex = ~r/darter\/(.*)\/introduction/
+
+    cond do
+      Regex.match?(hits_regex, topic) ->
+        hit = Poison.decode!(message.message, as: %Impact.Messages.Hit{})
+        Impact.Target.hit(hit.deviceId, hit.timestamp)
+      Regex.match?(intro_regex, topic) ->
+        introduction = Poison.decode!(message.message, as: %Impact.Messages.Introduction{})
+        Impact.TargetSupervisor.init_target(introduction.deviceId)
+      true ->
+        Logger.debug("Unrecognized topic")
     end
   end
 end
