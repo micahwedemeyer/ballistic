@@ -11,7 +11,7 @@ defmodule Impact.TargetSupervisor do
       Supervisor.start_child(__MODULE__, [device_id])
     else
       target_pids
-      |> Enum.find(&(Target.get_device_id(&1) == device_id))
+      |> Enum.find(&(Impact.Target.get_device_id(&1) == device_id))
     end
   end
 
