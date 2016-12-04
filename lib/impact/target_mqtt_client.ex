@@ -6,7 +6,8 @@ defmodule Impact.TargetMqttClient do
   # Define like this to override/overrule the start_link in Hulaaki.Client
   def start_link({:first}, name) do
     {:ok, pid} = GenServer.start_link(__MODULE__, %{}, name: name)
-    {:ok, connect(pid)}
+    pid |> connect |> schedule_ping
+    {:ok, pid}
   end
 
   def connect(pid) do
@@ -89,4 +90,23 @@ defmodule Impact.TargetMqttClient do
   end
 
   def handle_message(_message), do: :ok
+
+
+  defp schedule_ping(pid) do
+    Process.send_after(pid, :ping_server, 30 * 1000)
+    pid
+  end
+
+  def handle_info(:ping_server, state) do
+    self
+    |> schedule_ping
+    |> GenServer.cast(:ping)
+    {:noreply, state}
+  end
+
+  # Allow us to do it as a cast, not a call
+  def handle_cast(:ping, state) do
+    :ok = state.connection |> Connection.ping
+    {:noreply, state}
+  end
 end

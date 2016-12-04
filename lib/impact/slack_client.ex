@@ -1,5 +1,10 @@
 defmodule Impact.SlackClient do
+  require Logger
   use Slack
+
+  @message_types [
+    {"golive$", :golive}
+  ]
 
   def start_link(name) do
     token = Application.get_env(:slack, :api_token)
@@ -17,6 +22,24 @@ defmodule Impact.SlackClient do
   end
 
   # Private'ish API
+  def handle_message(message = %{type: "message"}, slack) do
+    message |> parse(slack) |> act_on_message(slack)
+  end
+
+  def act_on_message({:golive, message}, slack) do
+    Impact.Server.go_live
+  end
+
+  def act_on_message({:unknown, _message}, _slack), do: :ok
+
+  def parse(message, slack) do
+    Logger.debug("Slack message received: #{message.text}")
+    {_, type} = Enum.find(@message_types, {nil, :unknown}, fn {reg, _type} ->
+       String.match?(message.text, ~r/<@#{slack.me.id}>:?\s#{reg}/)
+     end)
+    {type, message}
+  end
+
   def handle_info(%{type: "message", text: text, channel: channel}, slack, state) do
     send_message(text, channel, slack)
     {:ok, state}

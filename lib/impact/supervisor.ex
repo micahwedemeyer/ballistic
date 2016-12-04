@@ -11,7 +11,7 @@ defmodule Impact.Supervisor do
       worker(Impact.MqttClient, [{:first}, Impact.MqttClient]),
       worker(Impact.TargetSupervisor, []),
       worker(Impact.TargetMqttClient, [{:first}, Impact.TargetMqttClient]),
-      worker(Impact.SlackClient, [Impact.SlackClient]),
+      #worker(Impact.SlackClient, [Impact.SlackClient]),
     ]
 
     supervise(children, strategy: :one_for_one)
