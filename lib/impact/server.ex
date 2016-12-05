@@ -44,7 +44,9 @@ defmodule Impact.Server do
     Impact.TargetSupervisor.target_device_ids
     |> Enum.each(&(Impact.Target.go_live(&1)))
 
-    #Impact.SlackClient.send_message(":gun: Targets Live! :gun:", "#bs-boardgames")
+    channel = Application.get_env(:slack, :ballista_channel)
+
+    Impact.SlackClient.send_message(":gun: Targets Live! :gun:", "##{channel}")
     {:noreply, state}
   end
 end

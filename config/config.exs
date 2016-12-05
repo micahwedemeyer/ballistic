@@ -35,5 +35,6 @@ config :impact,
   mqtt_port: 1883
 
 config :slack,
-  api_token: "xoxp-3354944671-40916064385-100693059171-c7b4409d0176e82cd8fbe92dd357ead1"
-  # api_token: "xoxb-112402977459-KKVyWzCz0kJ4w6P9uBWYoF7h" - # Ballista bot
+  #api_token: "xoxp-3354944671-40916064385-100693059171-c7b4409d0176e82cd8fbe92dd357ead1" # Micah
+  api_token: "xoxb-112402977459-KKVyWzCz0kJ4w6P9uBWYoF7h", # Ballista bot
+  ballista_channel: "bs-bottest"
