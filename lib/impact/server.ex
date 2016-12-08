@@ -34,7 +34,9 @@ defmodule Impact.Server do
     |> Enum.each(&(Impact.Target.play_show(&1, "lose")))
 
     # Report the result on slack
-    #Impact.SlackClient.send_message("It's a hit!", "#bs-boardgames")
+    channel = Application.get_env(:slack, :ballista_channel)
+    Impact.SlackClient.send_message(":fireworks: Hit!", "##{channel}")
+
     {:noreply, state}
   end
 
