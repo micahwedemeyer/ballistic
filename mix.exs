@@ -34,7 +34,10 @@ defmodule Impact.Mixfile do
       {:hulaaki, "~> 0.0.4"},
       {:slack, "~> 0.8.0"},
       {:poison, "~> 3.0"},
-      {:gproc, "~> 0.6.1"}
+      {:gproc, "~> 0.6.1"},
+
+      # Deployment
+      {:distillery, "~> 1.0"}
     ]
   end
 end
