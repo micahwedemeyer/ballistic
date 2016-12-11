@@ -20,7 +20,9 @@ environment :dev do
 end
 
 environment :prod do
-  set include_erts: true
+  # Since we are installing on the R-Pi, with a different architecture,
+  # we can't bundle ERTS. It has to already be installed.
+  set include_erts: false
   set include_src: false
   set cookie: :"*rw}s|M@6Zjo`N])O/?7duCZjc=jo<nDDLN8vj?A>(9Ngv>v|<v2K=UIZ;d`T0,Z"
 end

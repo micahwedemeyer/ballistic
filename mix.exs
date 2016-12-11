@@ -15,7 +15,7 @@ defmodule Impact.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [
-      applications: [:logger, :slack, :gproc],
+      applications: [:logger, :slack, :gproc, :poison, :hulaaki, :websocket_client],
       mod: {Impact, []}
     ]
   end
