@@ -1,4 +1,4 @@
-defmodule Impact.TargetSupervisor do
+defmodule Ballistic.TargetSupervisor do
   use Supervisor
   require Logger
 
@@ -11,7 +11,7 @@ defmodule Impact.TargetSupervisor do
       Supervisor.start_child(__MODULE__, [device_id])
     else
       target_pids
-      |> Enum.find(&(Impact.Target.get_device_id(&1) == device_id))
+      |> Enum.find(&(Ballistic.Target.get_device_id(&1) == device_id))
     end
   end
 
@@ -22,12 +22,12 @@ defmodule Impact.TargetSupervisor do
 
   def target_device_ids do
     target_pids
-    |> Enum.map(&(Impact.Target.get_device_id(&1)))
+    |> Enum.map(&(Ballistic.Target.get_device_id(&1)))
   end
 
   def init(:ok) do
     children = [
-      worker(Impact.Target, [])
+      worker(Ballistic.Target, [])
     ]
 
     supervise(children, strategy: :simple_one_for_one)

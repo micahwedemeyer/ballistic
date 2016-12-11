@@ -1,4 +1,4 @@
-defmodule Impact.SlackClient do
+defmodule Ballistic.SlackClient do
   require Logger
   use Slack
 
@@ -34,7 +34,7 @@ defmodule Impact.SlackClient do
   def handle_event(_, _, state), do: {:ok, state}
 
   defp act_on_message({:golive, _message}, _slack) do
-    Impact.Server.go_live
+    Ballistic.Server.go_live
   end
 
   defp act_on_message({:unknown, _message}, _slack), do: :ok

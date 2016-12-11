@@ -1,4 +1,4 @@
-defmodule Impact.TargetMqttClient do
+defmodule Ballistic.TargetMqttClient do
   require Logger
   alias Hulaaki.Message.Publish
   use Hulaaki.Client
@@ -13,8 +13,8 @@ defmodule Impact.TargetMqttClient do
   def connect(pid) do
     opts = [
       client_id: "target-mqtt-client",
-      host: Application.get_env(:impact, :mqtt_host),
-      port: Application.get_env(:impact, :mqtt_port)
+      host: Application.get_env(:ballistic, :mqtt_host),
+      port: Application.get_env(:ballistic, :mqtt_port)
     ]
 
     # Call Hulaaki.Client.connect
@@ -35,7 +35,7 @@ defmodule Impact.TargetMqttClient do
   end
 
   def play_show(device_id, show_id) do
-    message = Poison.encode!(%Impact.Messages.PlayShow{showId: show_id})
+    message = Poison.encode!(%Ballistic.Messages.PlayShow{showId: show_id})
     publish(topic: "darter/#{device_id}/playShow", message: message, qos: 0, dup: 0, retain: 0)
   end
 
@@ -69,11 +69,11 @@ defmodule Impact.TargetMqttClient do
   end
 
   def parse_message(:hits, message) do
-    Poison.decode!(message.message, as: %Impact.Messages.Hit{})
+    Poison.decode!(message.message, as: %Ballistic.Messages.Hit{})
   end
 
   def parse_message(:introduction, message) do
-    Poison.decode!(message.message, as: %Impact.Messages.Introduction{})
+    Poison.decode!(message.message, as: %Ballistic.Messages.Introduction{})
   end
 
   def parse_message(_topic, _message) do
@@ -81,12 +81,12 @@ defmodule Impact.TargetMqttClient do
     nil
   end
 
-  def handle_message(%Impact.Messages.Hit{} = hit) do
-    Impact.Target.hit(hit.deviceId, hit.timestamp)
+  def handle_message(%Ballistic.Messages.Hit{} = hit) do
+    Ballistic.Target.hit(hit.deviceId, hit.timestamp)
   end
 
-  def handle_message(%Impact.Messages.Introduction{} = intro) do
-    Impact.TargetSupervisor.init_target(intro.deviceId)
+  def handle_message(%Ballistic.Messages.Introduction{} = intro) do
+    Ballistic.TargetSupervisor.init_target(intro.deviceId)
   end
 
   def handle_message(_message), do: :ok

@@ -1,4 +1,4 @@
-defmodule Impact.Server do
+defmodule Ballistic.Server do
   use GenServer
   require Logger
 
@@ -17,7 +17,7 @@ defmodule Impact.Server do
   ## GenServer Callbacks
 
   def init(:ok) do
-    Logger.debug "Impact server started"
+    Logger.debug "Ballistic server started"
     {:ok, %{hits: 0}}
   end
 
@@ -26,16 +26,16 @@ defmodule Impact.Server do
     Logger.info("Hit! (#{device_id})")
 
     # Winner plays the win show
-    Impact.Target.play_show(device_id, "win")
+    Ballistic.Target.play_show(device_id, "win")
 
     # Play a lose show for everyone else
-    other_targets = Impact.TargetSupervisor.target_device_ids
+    other_targets = Ballistic.TargetSupervisor.target_device_ids
     |> Enum.reject(&(&1 == device_id))
-    |> Enum.each(&(Impact.Target.play_show(&1, "lose")))
+    |> Enum.each(&(Ballistic.Target.play_show(&1, "lose")))
 
     # Report the result on slack
     channel = Application.get_env(:slack, :ballista_channel)
-    Impact.SlackClient.send_message(":fireworks: Hit!", "##{channel}")
+    Ballistic.SlackClient.send_message(":fireworks: Hit!", "##{channel}")
 
     {:noreply, state}
   end
@@ -43,12 +43,12 @@ defmodule Impact.Server do
   def handle_cast({:go_live}, state) do
     Logger.info("Going live!")
 
-    Impact.TargetSupervisor.target_device_ids
-    |> Enum.each(&(Impact.Target.go_live(&1)))
+    Ballistic.TargetSupervisor.target_device_ids
+    |> Enum.each(&(Ballistic.Target.go_live(&1)))
 
     channel = Application.get_env(:slack, :ballista_channel)
 
-    Impact.SlackClient.send_message(":gun: Targets Live! :gun:", "##{channel}")
+    Ballistic.SlackClient.send_message(":gun: Targets Live! :gun:", "##{channel}")
     {:noreply, state}
   end
 end

@@ -1,4 +1,4 @@
-defmodule Impact.Target do
+defmodule Ballistic.Target do
   use GenServer
   require Logger
 
@@ -57,7 +57,7 @@ defmodule Impact.Target do
     new_state = state
     |> Map.update!(:hit_count, &(&1 + 1))
 
-    Impact.Server.report_hit(state.device_id)
+    Ballistic.Server.report_hit(state.device_id)
 
     Logger.debug "Target #{new_state.device_id} hit! (#{new_state.hit_count} total hits)"
     {:noreply, new_state}
@@ -65,7 +65,7 @@ defmodule Impact.Target do
 
   def handle_cast({:play_show, show_id}, state) do
     Logger.debug("Target #{state.device_id} plays show #{show_id}")
-    Impact.TargetMqttClient.play_show(state.device_id, show_id)
+    Ballistic.TargetMqttClient.play_show(state.device_id, show_id)
     {:noreply, state}
   end
 end

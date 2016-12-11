@@ -1,8 +1,8 @@
-defmodule Impact.Mixfile do
+defmodule Ballistic.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :impact,
+    [app: :ballistic,
      version: "0.1.0",
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
@@ -16,7 +16,7 @@ defmodule Impact.Mixfile do
   def application do
     [
       applications: [:logger, :slack, :gproc, :poison, :hulaaki, :websocket_client],
-      mod: {Impact, []}
+      mod: {Ballistic, []}
     ]
   end
 

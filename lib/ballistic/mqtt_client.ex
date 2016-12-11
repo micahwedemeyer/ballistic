@@ -1,6 +1,6 @@
-defmodule Impact.MqttClient do
+defmodule Ballistic.MqttClient do
   alias Hulaaki.Message.Publish
-  alias Impact.Server
+  alias Ballistic.Server
   use Hulaaki.Client
 
   # Define like this to override/overrule the start_link in Hulaaki.Client
@@ -11,9 +11,9 @@ defmodule Impact.MqttClient do
 
   def connect(pid) do
     opts = [
-      client_id: Application.get_env(:impact, :mqtt_client_id),
-      host: Application.get_env(:impact, :mqtt_host),
-      port: Application.get_env(:impact, :mqtt_port)
+      client_id: Application.get_env(:ballistic, :mqtt_client_id),
+      host: Application.get_env(:ballistic, :mqtt_host),
+      port: Application.get_env(:ballistic, :mqtt_port)
     ]
 
     # Call Hulaaki.Client.connect
@@ -23,7 +23,7 @@ defmodule Impact.MqttClient do
 
   # Public API
   def go_live(deviceId, {red, green, blue}) do
-    message = Poison.encode!(%Impact.Messages.GoLive{red: red, green: green, blue: blue})
+    message = Poison.encode!(%Ballistic.Messages.GoLive{red: red, green: green, blue: blue})
     publish(topic: "darter/#{deviceId}/goLive", message: message, qos: 0, dup: 0, retain: 0)
   end
 
@@ -44,12 +44,12 @@ defmodule Impact.MqttClient do
 
   # Override callbacks from Hulaaki.Client
   def on_subscribed_publish(message: %Publish{topic: "hits"} = message, state: _) do
-    hit = Poison.decode!(message.message, as: %Impact.Messages.Hit{})
-    Impact.Target.hit(hit[:deviceId], hit[:timestamp])
+    hit = Poison.decode!(message.message, as: %Ballistic.Messages.Hit{})
+    Ballistic.Target.hit(hit[:deviceId], hit[:timestamp])
   end
 
   def on_subscribed_publish(message: %Publish{topic: "introduction"} = message, state: _) do
-    intro = Poison.decode!(message.message, as: %Impact.Messages.Introduction{})
-    Impact.TargetSupervisor.init_target(intro[:deviceId])
+    intro = Poison.decode!(message.message, as: %Ballistic.Messages.Introduction{})
+    Ballistic.TargetSupervisor.init_target(intro[:deviceId])
   end
 end

@@ -10,11 +10,11 @@ use Mix.Config
 
 # You can configure for your application as:
 #
-#     config :impact, key: :value
+#     config :ballistic, key: :value
 #
 # And access this configuration in your application as:
 #
-#     Application.get_env(:impact, :key)
+#     Application.get_env(:ballistic, :key)
 #
 # Or configure a 3rd-party app:
 #
@@ -29,8 +29,8 @@ use Mix.Config
 #
 #     import_config "#{Mix.env}.exs"
 
-config :impact,
-  mqtt_client_id: "impact-server",
+config :ballistic,
+  mqtt_client_id: "ballistic-server",
   mqtt_host: "localhost",
   mqtt_port: 1883
 
