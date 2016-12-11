@@ -1,6 +1,5 @@
 defmodule Ballistic.MqttClient do
   alias Hulaaki.Message.Publish
-  alias Ballistic.Server
   use Hulaaki.Client
 
   # Define like this to override/overrule the start_link in Hulaaki.Client

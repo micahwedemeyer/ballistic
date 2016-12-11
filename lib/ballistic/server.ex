@@ -29,7 +29,7 @@ defmodule Ballistic.Server do
     Ballistic.Target.play_show(device_id, "win")
 
     # Play a lose show for everyone else
-    other_targets = Ballistic.TargetSupervisor.target_device_ids
+    Ballistic.TargetSupervisor.target_device_ids
     |> Enum.reject(&(&1 == device_id))
     |> Enum.each(&(Ballistic.Target.play_show(&1, "lose")))
 
