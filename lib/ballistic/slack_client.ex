@@ -3,7 +3,7 @@ defmodule Ballistic.SlackClient do
   use Slack
 
   @message_types [
-    {"golive$", :golive}
+    {"go live$", :golive}
   ]
 
   def start_link(name) do
