@@ -57,7 +57,7 @@ defmodule Ballistic.Server do
 
     channel = Application.get_env(:slack, :ballista_channel)
 
-    Ballistic.SlackClient.send_message(":gun: Targets Live! :gun:", "##{channel}")
+    Ballistic.SlackClient.send_message("@channel :gun: Targets Live! :gun:", "##{channel}")
 
     new_state = state |> Map.put(:status, :live)
     {:noreply, new_state}
