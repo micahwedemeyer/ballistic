@@ -3,7 +3,7 @@ defmodule Ballistic.Target do
   require Logger
 
   @enforce_keys [:device_id]
-  defstruct [:device_id, :color, :hit_count]
+  defstruct [:device_id, :name, :color, :hit_count]
 
   def start_link(device_id) do
     args = %__MODULE__{device_id: device_id}
@@ -13,6 +13,9 @@ defmodule Ballistic.Target do
   def whereis(device_id) do
     GenServer.whereis(via_tuple(device_id))
   end
+
+  def set_name(pid, name), do: GenServer.call(pid, {:set_name, name})
+  def get_name(pid), do: GenServer.call(pid, {:get_name})
 
   def get_device_id(pid) do
     GenServer.call(pid, :get_device_id)
@@ -47,6 +50,17 @@ defmodule Ballistic.Target do
     |> Map.put(:hit_count, 0)
 
     {:ok, target}
+  end
+
+  def handle_call({:set_name, name}, _from, state) do
+    new_state = state
+    |> Map.put(:name, name)
+
+    {:reply, :ok, new_state}
+  end
+
+  def handle_call({:get_name}, _from, state) do
+    {:reply, state.name, state}
   end
 
   def handle_call(:get_device_id, _from, state) do

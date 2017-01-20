@@ -37,8 +37,16 @@ defmodule Ballistic.Server do
         |> Enum.reject(&(&1 == device_id))
         |> Enum.each(&(Ballistic.Target.play_show(&1, "lose")))
 
+        team_name = Ballistic.Target.whereis(device_id) |> Ballistic.Target.get_name
+        message = case team_name do
+          nil ->
+            ":fireworks: Winner!"
+          name ->
+            ":fireworks: Winner - #{name}!"
+        end
+
         # Report the result on slack
-        Ballistic.SlackClient.send_message(":fireworks: Winner!", "##{channel}")
+        Ballistic.SlackClient.send_message(message, "##{channel}")
       _ ->
         # Shooting a dead target, eh?
         Ballistic.Target.play_show(device_id, "lose")
