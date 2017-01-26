@@ -15,7 +15,7 @@ defmodule Ballistic.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [
-      applications: [:logger, :slack, :gproc, :poison, :hulaaki, :websocket_client],
+      applications: [:logger, :slack, :gproc, :poison, :hulaaki, :websocket_client, :postgrex],
       mod: {Ballistic, []}
     ]
   end
@@ -35,6 +35,8 @@ defmodule Ballistic.Mixfile do
       {:slack, "~> 0.8.0"},
       {:poison, "~> 3.0"},
       {:gproc, "~> 0.6.1"},
+      {:postgrex, "~> 0.13.0"},
+      {:ecto, "~> 2.1.3"},
 
       # Deployment
       {:distillery, "~> 1.0"}

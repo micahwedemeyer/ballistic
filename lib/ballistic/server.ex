@@ -18,7 +18,7 @@ defmodule Ballistic.Server do
 
   def init(:ok) do
     Logger.debug "Ballistic server started"
-    {:ok, %{hits: 0, status: :idle}}
+    {:ok, %{status: :idle}}
   end
 
   def handle_cast({:report_hit, device_id}, state) do
@@ -27,30 +27,29 @@ defmodule Ballistic.Server do
 
     channel = Application.get_env(:slack, :ballista_channel)
 
+    target = Ballistic.Target.whereis(device_id)
+
     case state[:status] do
       :live ->
+        winner = target
+        losers = Ballistic.TargetSupervisor.target_pids |> Enum.reject(&(&1 == winner))
+
         # Winner plays the win show
-        Ballistic.Target.play_show(device_id, "win")
+        Ballistic.Target.play_show(winner, "win")
+        Ballistic.Target.increment_score(winner)
 
-        # Play a lose show for everyone else
-        Ballistic.TargetSupervisor.target_device_ids
-        |> Enum.reject(&(&1 == device_id))
-        |> Enum.each(&(Ballistic.Target.play_show(&1, "lose")))
+        # Losers play the lose show
+        Enum.each(losers, &(Ballistic.Target.play_show(&1, "lose")))
 
-        team_name = Ballistic.Target.whereis(device_id) |> Ballistic.Target.get_name
-        message = case team_name do
-          nil ->
-            ":fireworks: Winner!"
-          name ->
-            ":fireworks: Winner - #{name}!"
-        end
+        team = Ballistic.Target.get_team(target)
+
+        message = "<!here> :fireworks: Winner! #{team.name}\n#{team.slack_win_link}"
 
         # Report the result on slack
         Ballistic.SlackClient.send_message(message, "##{channel}")
       _ ->
         # Shooting a dead target, eh?
-        Ballistic.Target.play_show(device_id, "lose")
-        Ballistic.SlackClient.send_message(":no_entry_sign: It's not live, idiot! :no_entry_sign:", "##{channel}")
+        Ballistic.Target.play_show(target, "lose")
     end
 
     new_state = state |> Map.put(:status, :idle)
@@ -60,12 +59,12 @@ defmodule Ballistic.Server do
   def handle_cast({:go_live}, state) do
     Logger.info("Going live!")
 
-    Ballistic.TargetSupervisor.target_device_ids
+    Ballistic.TargetSupervisor.target_pids
     |> Enum.each(&(Ballistic.Target.go_live(&1)))
 
     channel = Application.get_env(:slack, :ballista_channel)
 
-    Ballistic.SlackClient.send_message(":gun: Targets Live! :gun: <!here>", "##{channel}")
+    Ballistic.SlackClient.send_message("<!here> :gun: Targets Live! :gun:", "##{channel}")
 
     new_state = state |> Map.put(:status, :live)
     {:noreply, new_state}

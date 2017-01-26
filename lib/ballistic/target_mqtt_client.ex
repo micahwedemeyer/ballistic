@@ -82,7 +82,8 @@ defmodule Ballistic.TargetMqttClient do
   end
 
   def handle_message(%Ballistic.Messages.Hit{} = hit) do
-    Ballistic.Target.hit(hit.deviceId, hit.timestamp)
+    Ballistic.Target.whereis(hit.deviceId)
+    |> Ballistic.Target.hit(hit.timestamp)
   end
 
   def handle_message(%Ballistic.Messages.Introduction{} = intro) do

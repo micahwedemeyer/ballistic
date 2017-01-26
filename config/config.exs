@@ -34,6 +34,16 @@ config :ballistic,
   mqtt_host: "localhost",
   mqtt_port: 1883
 
+config :ballistic, ecto_repos: [Ballistic.Repo]
+
+config :ballistic, Ballistic.Repo,
+  adapter: Ecto.Adapters.Postgres
+  # Defined in the <env>.secret.exs
+  # database: "ballistic_development",
+  # username: "user",
+  # password: "pass",
+  # hostname: "localhost"
+
 config :slack,
   ballista_channel: "bs-nerfgun",
   api_token: "get-this-from-config-secret"

@@ -3,7 +3,7 @@ defmodule Ballistic.Target do
   require Logger
 
   @enforce_keys [:device_id]
-  defstruct [:device_id, :name, :color, :hit_count]
+  defstruct [:device_id, :name, :color]
 
   def start_link(device_id) do
     args = %__MODULE__{device_id: device_id}
@@ -14,26 +14,12 @@ defmodule Ballistic.Target do
     GenServer.whereis(via_tuple(device_id))
   end
 
-  def set_name(pid, name), do: GenServer.call(pid, {:set_name, name})
-  def get_name(pid), do: GenServer.call(pid, {:get_name})
-
-  def get_device_id(pid) do
-    GenServer.call(pid, :get_device_id)
-  end
-
-  def hit(device_id, timestamp) do
-    whereis(device_id)
-    |> GenServer.cast({:hit, timestamp})
-  end
-
-  def play_show(device_id, show_id) do
-    whereis(device_id)
-    |> GenServer.cast({:play_show, show_id})
-  end
-
-  def go_live(device_id) do
-    play_show(device_id, "live")
-  end
+  def get_team(pid), do: GenServer.call(pid, {:get_team})
+  def get_device_id(pid), do: GenServer.call(pid, :get_device_id)
+  def hit(pid, timestamp), do: GenServer.cast(pid, {:hit, timestamp})
+  def play_show(pid, show_id), do: GenServer.cast(pid, {:play_show, show_id})
+  def go_live(pid), do: play_show(pid, "live")
+  def increment_score(pid), do: GenServer.cast(pid, {:increment_score})
 
   # Private?
   defp via_tuple(device_id) do
@@ -47,20 +33,12 @@ defmodule Ballistic.Target do
     color = {0, 0, 0}
     target = target
     |> Map.put(:color, color)
-    |> Map.put(:hit_count, 0)
 
     {:ok, target}
   end
 
-  def handle_call({:set_name, name}, _from, state) do
-    new_state = state
-    |> Map.put(:name, name)
-
-    {:reply, :ok, new_state}
-  end
-
-  def handle_call({:get_name}, _from, state) do
-    {:reply, state.name, state}
+  def handle_call({:get_team}, _from, state) do
+    {:reply, target_model(state).team, state}
   end
 
   def handle_call(:get_device_id, _from, state) do
@@ -68,18 +46,32 @@ defmodule Ballistic.Target do
   end
 
   def handle_cast({:hit, _timestamp}, state) do
-    new_state = state
-    |> Map.update!(:hit_count, &(&1 + 1))
-
+    Logger.debug "Target #{state.device_id} hit!"
     Ballistic.Server.report_hit(state.device_id)
-
-    Logger.debug "Target #{new_state.device_id} hit! (#{new_state.hit_count} total hits)"
-    {:noreply, new_state}
+    {:noreply, state}
   end
 
   def handle_cast({:play_show, show_id}, state) do
     Logger.debug("Target #{state.device_id} plays show #{show_id}")
     Ballistic.TargetMqttClient.play_show(state.device_id, show_id)
     {:noreply, state}
+  end
+
+  def handle_cast({:increment_score}, state) do
+    t = target_model(state)
+
+    t
+    |> changeset(%{score: t.score + 1})
+    |> Ballistic.Repo.insert
+    {:noreply, state}
+  end
+
+  defp target_model(state) do
+    Ballistic.Repo.get_by(Ballistic.Models.Target, [device_id: state.device_id])
+    |> Ballistic.Repo.preload(:team)
+  end
+
+  defp changeset(target, params) do
+    Ballistic.Models.Target.changeset(target, params)
   end
 end

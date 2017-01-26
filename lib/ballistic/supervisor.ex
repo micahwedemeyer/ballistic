@@ -7,6 +7,7 @@ defmodule Ballistic.Supervisor do
 
   def init(:ok) do
     children = [
+      supervisor(Ballistic.Repo, []),
       worker(Ballistic.Server, [Ballistic.Server]),
       worker(Ballistic.MqttClient, [{:first}, Ballistic.MqttClient]),
       worker(Ballistic.TargetSupervisor, []),
