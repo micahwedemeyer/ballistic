@@ -60,8 +60,8 @@ defmodule Ballistic.Target do
   def handle_cast({:increment_score}, state) do
     t = target_model(state)
 
-    t
-    |> changeset(%{score: t.score + 1})
+    t.team
+    |> Ballistic.Models.Team.changeset(%{score: t.team.score + 1})
     |> Ballistic.Repo.insert
     {:noreply, state}
   end
