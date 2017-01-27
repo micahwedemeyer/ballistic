@@ -33,10 +33,10 @@ defmodule Ballistic.Mixfile do
     [
       {:hulaaki, "~> 0.0.4"},
       {:slack, "~> 0.8.0"},
-      {:poison, "~> 3.0"},
+      {:poison, "~> 2.0"},
       {:gproc, "~> 0.6.1"},
-      {:postgrex, "~> 0.13.0"},
-      {:ecto, "~> 2.1.3"},
+      {:postgrex, "~> 0.12.0"},
+      {:ecto, "~> 2.0.0"},
 
       # Deployment
       {:distillery, "~> 1.0"}
