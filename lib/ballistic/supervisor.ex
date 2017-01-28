@@ -12,8 +12,15 @@ defmodule Ballistic.Supervisor do
       worker(Ballistic.MqttClient, [{:first}, Ballistic.MqttClient]),
       worker(Ballistic.TargetSupervisor, []),
       worker(Ballistic.TargetMqttClient, [{:first}, Ballistic.TargetMqttClient]),
-      worker(Ballistic.SlackClient, [Ballistic.SlackClient])
     ]
+
+    children = if Mix.env == :test do
+      children
+    else
+      children ++ [
+        worker(Ballistic.SlackClient, [Ballistic.SlackClient])
+      ]
+    end
 
     supervise(children, strategy: :one_for_one)
   end

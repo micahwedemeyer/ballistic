@@ -1,31 +1,36 @@
 defmodule BallisticTest do
   use ExUnit.Case
+  import Ballistic.Factory
   doctest Ballistic
 
-  setup_all do
-    Application.stop(:ballistic)
-  end
+  # setup_all do
+  #   Application.stop(:ballistic)
+  # end
 
   setup do
-    pid = Ballistic.MqttClient.start_link({:first}, Ballistic.MqttClient)
-
-    Ballistic.TargetSupervisor.start_link()
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Ballistic.Repo)
+    insert(:target, [device_id: "1234"])
     Ballistic.TargetSupervisor.init_target("1234")
+
+    insert(:target, [device_id: "abcd"])
     Ballistic.TargetSupervisor.init_target("abcd")
+
+    insert(:target, [device_id: "xyz"])
     Ballistic.TargetSupervisor.init_target("xyz")
 
-    Ballistic.TargetMqttClient.start_link({:first}, Ballistic.TargetMqttClient)
     Ballistic.TargetMqttClient.subscribe_to_hits
     Ballistic.TargetMqttClient.subscribe_to_introductions
 
-    Ballistic.Server.start_link(Ballistic.Server)
 
-    {:ok, mqtt_client: pid}
+    {:ok, foo: :bar}
   end
 
-  test "receiving a hit" do
-    Ballistic.MqttClient.publish(topic: "darter/1234/hits", message: "{\"deviceId\":\"1234\", \"timestamp\":1234}", qos: 0, dup: 0, retain: 0)
+  test "receiving a live hit" do
+    Ballistic.Server.go_live()
     :timer.sleep(100)
+
+    Ballistic.MqttClient.publish(topic: "darter/1234/hits", message: "{\"deviceId\":\"1234\", \"timestamp\":1234}", qos: 0, dup: 0, retain: 0)
+    :timer.sleep(200)
   end
 
   test "receiving an intro" do

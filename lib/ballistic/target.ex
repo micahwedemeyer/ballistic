@@ -62,7 +62,7 @@ defmodule Ballistic.Target do
 
     t.team
     |> Ballistic.Models.Team.changeset(%{score: t.team.score + 1})
-    |> Ballistic.Repo.insert
+    |> Ballistic.Repo.update!
     {:noreply, state}
   end
 

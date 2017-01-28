@@ -46,7 +46,7 @@ defmodule Ballistic.Server do
         message = "<!here> :fireworks: Winner! #{team.name}\n#{team.slack_win_link}"
 
         # Report the result on slack
-        Ballistic.SlackClient.send_message(message, "##{channel}")
+        if Mix.env != :test, do: Ballistic.SlackClient.send_message(message, "##{channel}")
       _ ->
         # Shooting a dead target, eh?
         Ballistic.Target.play_show(target, "lose")
@@ -64,7 +64,7 @@ defmodule Ballistic.Server do
 
     channel = Application.get_env(:slack, :ballista_channel)
 
-    Ballistic.SlackClient.send_message("<!here> :gun: Targets Live! :gun:", "##{channel}")
+    if Mix.env != :test, do: Ballistic.SlackClient.send_message("<!here> :gun: Targets Live! :gun:", "##{channel}")
 
     new_state = state |> Map.put(:status, :live)
     {:noreply, new_state}
