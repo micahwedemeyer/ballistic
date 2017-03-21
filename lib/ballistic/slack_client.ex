@@ -27,7 +27,7 @@ defmodule Ballistic.SlackClient do
   end
 
   # Private'ish API
-  def handle_event(message = %{type: "message"}, slack, state) do
+  def handle_event(message = %{type: "message", text: _}, slack, state) do
     message |> parse(slack) |> act_on_message(slack)
     {:ok, state}
   end
