@@ -3,8 +3,8 @@ defmodule Ballistic.Mixfile do
 
   def project do
     [app: :ballistic,
-     version: "0.1.0",
-     elixir: "~> 1.3",
+     version: "0.1.1",
+     elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps(),
@@ -39,17 +39,17 @@ defmodule Ballistic.Mixfile do
   defp deps do
     [
       {:hulaaki, "~> 0.0.4"},
-      {:slack, "~> 0.8.0"},
-      {:poison, "~> 2.0"},
+      {:slack, "~> 0.11.0"},
+      {:poison, "~> 3.1"},
       {:gproc, "~> 0.6.1"},
-      {:postgrex, "~> 0.12.0"},
-      {:ecto, "~> 2.0.0"},
+      {:postgrex, "~> 0.13"},
+      {:ecto, "~> 2.1"},
 
       # Test
-      {:ex_machina, "~> 1.0", only: :test},
+      {:ex_machina, "~> 2.0", only: :test},
 
       # Deployment
-      {:distillery, "~> 1.0"}
+      {:distillery, "~> 1.2"}
     ]
   end
 end
